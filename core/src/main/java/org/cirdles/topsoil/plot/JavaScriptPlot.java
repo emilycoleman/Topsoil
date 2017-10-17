@@ -121,6 +121,7 @@ public abstract class JavaScriptPlot extends AbstractPlot implements JavaFXDispl
     private WebView webView;
     private JSObject topsoil;
     private final JavaScriptBridge bridge = new JavaScriptBridge();
+    private final RegressionLine regression = new RegressionLine();
 
     /**
      * Creates a new {@link JavaScriptPlot} using the specified source file. No properties are set by default.
@@ -268,6 +269,7 @@ public abstract class JavaScriptPlot extends AbstractPlot implements JavaFXDispl
                             topsoil = (JSObject) webEngine.executeScript("topsoil");
 
                             topsoil.setMember("bridge", bridge);
+                            topsoil.setMember("regression", regression);
 
                             if (getData() != null) {
                                 topsoil.call("setData", getData());

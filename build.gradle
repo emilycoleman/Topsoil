@@ -66,6 +66,7 @@ subprojects {
         compile 'com.github.johnzeringue:extendsfx:v1.0.0-alpha.2'
         compile 'com.github.cirdles:commons:0f628cc'
         compile 'org.controlsfx:controlsfx:8.20.9'
+        compile 'com.github.cirdles.McLeanRegression:api:-SNAPSHOT'
 
         testCompile 'com.google.code.findbugs:annotations:3.0.0'
         testCompile 'com.google.jimfs:jimfs:1.0'

@@ -7,6 +7,10 @@ package org.cirdles.topsoil.plot;
  */
 public class JavaScriptBridge {
 
+    public void test(Object data) {
+        System.out.println(data + "\n");
+    }
+
     /**
      * Prints a string to System.out.
      *

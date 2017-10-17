@@ -30,6 +30,7 @@ public class BasePlotProperties {
     public static final String ISOTOPE_TYPE = "Isotope";
     public static final String CONCORDIA_LINE = "Concordia";
     public static final String EVOLUTION_MATRIX = "Evolution";
+    public static final String REGRESSION_LINE = "Regression";
 
     private BasePlotProperties() {
         // prevents this class from being instantiated

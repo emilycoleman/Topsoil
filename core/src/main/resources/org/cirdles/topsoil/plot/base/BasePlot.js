@@ -40,7 +40,8 @@ plot.propertiesKeys = [
     'Bars',
     'Concordia',
     'Evolution',
-    'Isotope'];
+    'Isotope',
+    'Regression'];
 
 /*
     Creates an SVG group for data elements like points and ellipses. Inserting other groups below this one ensures that
@@ -151,9 +152,6 @@ plot.initialize = function (data) {
     // function to manually the x and y axes' extents
     topsoil.setAxes = function() {
 
-        alert("ymin: " + plot.getProperty("Y Min"));
-        alert("ymax: " + plot.getProperty("Y Max"));
-
         // if the user hasn't set a new extent for a field, leave it as-is
         if(plot.getProperty("X Min").length == 0) {
             var xMin = plot.xAxisScale.domain()[0];
@@ -180,8 +178,6 @@ plot.initialize = function (data) {
         if(xMin >= xMax) { xMax = parseFloat(xMin) + 10; }
         if(yMin >= yMax) { yMax = parseFloat(yMin) + 1; }
 
-        alert("ymin: " + yMin);
-        alert("ymax: " + yMax);
         changeAxes(xMin, xMax, yMin, yMax);
     };
 
@@ -222,11 +218,33 @@ plot.setData = function (data) {
     plot.update(plot.data);
 };
 
+plot.calculateRegressionLine = function() {
+    var data = plot.data;
+
+    var x_list = [];
+    var y_list = [];
+    var sigma_x_list = [];
+    var sigma_y_list = [];
+    var rho_list = [];
+
+    var fillLists = data.map(function (d) {
+        x_list.push(d.x);
+        y_list.push(d.y);
+        sigma_x_list.push(d.sigma_x);
+        sigma_y_list.push(d.sigma_y);
+        rho_list.push(d.rho);
+    });
+
+    topsoil.regression.fitLineToDataFor2D(x_list.toString(), y_list.toString(), sigma_x_list.toString(), sigma_y_list.toString(), rho_list.toString());
+};
+
 /*
     Updates plot elements. This function handles operations that need to be re-performed every time there is a change made
     to the plot.
  */
 plot.update = function (data) {
+
+    plot.calculateRegressionLine();
 
     // Makes sure that the plot has been initialized.
     if (!plot.initialized) {
