@@ -218,34 +218,11 @@ plot.setData = function (data) {
     plot.update(plot.data);
 };
 
-plot.calculateRegressionLine = function() {
-    var data = plot.data;
-
-    var x_list = [];
-    var y_list = [];
-    var sigma_x_list = [];
-    var sigma_y_list = [];
-    var rho_list = [];
-
-    var fillLists = data.map(function (d) {
-        x_list.push(d.x);
-        y_list.push(d.y);
-        sigma_x_list.push(d.sigma_x);
-        sigma_y_list.push(d.sigma_y);
-        rho_list.push(d.rho);
-    });
-
-    topsoil.regression.fitLineToDataFor2D(x_list.toString(), y_list.toString(), sigma_x_list.toString(), sigma_y_list.toString(), rho_list.toString());
-};
-
 /*
     Updates plot elements. This function handles operations that need to be re-performed every time there is a change made
     to the plot.
  */
 plot.update = function (data) {
-
-    plot.calculateRegressionLine();
-
     // Makes sure that the plot has been initialized.
     if (!plot.initialized) {
         plot.initialize(data);
@@ -348,6 +325,8 @@ plot.update = function (data) {
     // Manage the plot elements
     plot.managePoints();
     plot.manageEllipses();
+    plot.manageRegressionLine();
+    plot.manageRegressionLine();
     plot.manageUncertaintyBars();
     plot.managePlotFeatures();
 };
@@ -375,6 +354,11 @@ plot.zoomed = function() {
     // re-tick the axes
     plot.area.selectAll(".x.axis").call(plot.xAxis);
     plot.area.selectAll(".y.axis").call(plot.yAxis);
+
+    //If necessary, update the regression line
+    if(plot.regressionVisible) {
+        plot.drawRegressionLine();
+    }
 
     plot.update(topsoil.data);
 };
@@ -456,6 +440,27 @@ plot.manageEllipses = function () {
     // If ellipses should NOT be visible, but are...
     else if (plot.ellipsesVisible) {
         plot.removeEllipses();
+    }
+};
+
+plot.manageRegressionLine = function() {
+    // If RegressionLine shouldn't be visible
+    if(plot.getProperty("Regression")) {
+
+        // If the RegressionLine needs to be updated
+        if (plot.regressionVisible) {
+            plot.updateRegressionLine();
+        }
+
+        //If RegressionLine needs to be drawn
+        else {
+            plot.drawRegressionLine();
+        }
+    }
+
+    //If RegressionLine should not be visible, but is
+    else if (plot.regressionVisible) {
+        plot.removeRegressionLine();
     }
 };
 
@@ -553,6 +558,7 @@ plot.removeDataFeatures = function () {
     Removes all plot features from the plot.
  */
 plot.removePlotFeatures = function () {
+    plot.removeRegressionLine();
     plot.removeConcordia();
     plot.removeEvolutionMatrix();
 };

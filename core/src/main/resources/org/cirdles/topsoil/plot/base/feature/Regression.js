@@ -1,32 +1,92 @@
-plot.calculateRegressionLine = function() {
+/**
+ * @author Emily Coleman
+ */
 
+if(plot.regressionVisible == null) {
+    plot.regressionVisible = false;
+}
+
+/**
+ *The y-intercept of the McLean Regression line.
+ * @type {number}
+ */
+plot.regressionYIntercept = 0;
+
+/**
+ * The slope of the McLean Regression line.
+ * @type {number}
+ */
+plot.regressionSlope = 0;
+
+/**
+ * Uses the RegressionLine.java class to calculate the McLean Regression.
+ *
+ */
+plot.calculateRegressionLine = function() {
     var data = plot.data;
 
-    x_list = [];
-    parse_x(data, function (d) {
-        x_list.add(d.x);
+    var x_list = [];
+    var y_list = [];
+    var sigma_x_list = [];
+    var sigma_y_list = [];
+    var rho_list = [];
+
+    var fillLists = data.map(function (d) {
+        x_list.push(d.x);
+        y_list.push(d.y);
+        sigma_x_list.push(d.sigma_x);
+        sigma_y_list.push(d.sigma_y);
+        rho_list.push(d.rho);
     });
 
-    y_list = [];
-    parse_y(data, function(d) {
-        y_list.add(d.y);
-    });
+    topsoil.regression.fitLineToDataFor2D(x_list.toString(), y_list.toString(), sigma_x_list.toString(), sigma_y_list.toString(), rho_list.toString());
 
-    sigma_x_list = [];
-    parse_sigma_x(data, function(d) {
-        sigma_x_list.add(d.sigma_x);
-    });
+    plot.regressionSlope = topsoil.regression.getSlope();
+    plot.regressionYIntercept = topsoil.regression.getIntercept();
+};
 
-    sigma_y_list = [];
-    parse_sigma_y(data, function(d) {
-        sigma_y_list.add(d.sigma_y);
-    });
+/**
+ * Creates the SVG elements required to display the regression line.
+ */
+plot.drawRegressionLine = function() {
+    plot.calculateRegressionLine();
 
-    rho_list = [];
-    parse_rho(data, function(d) {
-        rho_list.add(d.rho);
-    });
+    // Removes line before redrawing it.
+    if (plot.regressionVisible) {
+        plot.removeRegressionLine();
+    }
 
-    var regressionLine = topsoil.regression.fitLineToDataFor2D(x_list, y_list, sigma_x_list, sigma_y_list, rho);
-    alert(regressionLine);
+    // Creates a separate SVG group for points.
+    plot.regressionGroup = plot.area.clipped.insert("g", ".dataGroup")
+        .attr("class", "regressionGroup");
+
+    plot.regressionVisible = true;
+    plot.updateRegressionLine();
+};
+
+plot.updateRegressionLine = function() {
+
+    if (plot.regressionVisible) {
+        x1 = 0;
+        y1 = plot.regressionYIntercept;
+        x2 = plot.xAxisScale.domain()[0];
+        y2 = (plot.regressionSlope * x2) + plot.regressionYIntercept; //y = mx + b
+
+        var line = plot.regressionGroup.selectAll(".regression")
+            .append("line")
+            .attr("class", "regression")
+            .attr("x1", x1)
+            .attr("y1", y1)
+            .attr("x2", x2)
+            .attr("y2", y2)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1);
+    }
+};
+
+plot.removeRegressionLine = function() {
+    if (plot.regressionVisible) {
+        plot.regressionGroup.remove();
+        plot.regressionVisible = false;
+    }
 };
