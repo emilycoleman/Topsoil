@@ -357,7 +357,7 @@ plot.zoomed = function() {
 
     //If necessary, update the regression line
     if(plot.regressionVisible) {
-        plot.drawRegressionLine();
+        plot.updateRegressionLine();
     }
 
     plot.update(topsoil.data);

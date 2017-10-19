@@ -51,12 +51,12 @@ plot.calculateRegressionLine = function() {
 plot.drawRegressionLine = function() {
     plot.calculateRegressionLine();
 
-    // Removes line before redrawing it.
+    // Remove line before redrawing it.
     if (plot.regressionVisible) {
         plot.removeRegressionLine();
     }
 
-    // Creates a separate SVG group for points.
+    // Create a separate SVG group for the regression line.
     plot.regressionGroup = plot.area.clipped.insert("g", ".dataGroup")
         .attr("class", "regressionGroup");
 
@@ -67,12 +67,14 @@ plot.drawRegressionLine = function() {
 plot.updateRegressionLine = function() {
 
     if (plot.regressionVisible) {
+
+        // Draw a line from point x1, y1 to point x2, y2.
         x1 = 0;
         y1 = plot.regressionYIntercept;
         x2 = plot.xAxisScale.domain()[0];
         y2 = (plot.regressionSlope * x2) + plot.regressionYIntercept; //y = mx + b
 
-        var line = plot.regressionGroup.selectAll(".regression")
+        line = plot.regressionGroup.selectAll(".regression")
             .append("line")
             .attr("class", "regression")
             .attr("x1", x1)
